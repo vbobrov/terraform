@@ -3,7 +3,7 @@ This template will deploy two or more ISE nodes behind an F5 load balancer.
 
 The template will fully configure F5 and the ISE nodes, albeit with minimal settings
 
-Full walk through of this template can be found at https://securityccie.net/blah
+Full walk through of this template can be found at https://securityccie.net/2023/02/01/ise-and-f5-deployment-with-terraform-and-ansible/
 
 The topology of the deployment is shown on the diagram
 
