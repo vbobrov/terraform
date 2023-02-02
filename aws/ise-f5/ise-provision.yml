@@ -1,0 +1,121 @@
+- hosts: all
+  connection: httpapi
+  gather_facts: False
+  tasks:
+
+    - name: Check if ISE is up
+      uri:
+        url: https://{{ansible_host}}/ers/config/service/versioninfo
+        timeout: 10
+        url_username: "{{ise_username}}"
+        url_password: "{{ise_password}}"
+        validate_certs: no
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+      register: version
+      until: version.status==200 and "json" in version and "VersionInfo" in version.json
+      retries: 1000
+      delay: 5
+
+    - name: Install Root Certificate
+      cisco.ise.trusted_certificate_import:
+        ise_hostname: "{{ansible_host}}"
+        ise_username: "{{ise_username}}"
+        ise_password: "{{ise_password}}"
+        ise_verify: "{{ise_verify}}"
+        allowBasicConstraintCAFalse: true
+        allowOutOfDateCert: true
+        allowSHA1Certificates: true
+        data: "{{ca_cert}}"
+
+    - name: Install Wildcard Cert
+      cisco.ise.system_certificate_import:
+        ise_hostname: "{{ansible_host}}"
+        ise_username: "{{ise_username}}"
+        ise_password: "{{ise_password}}"
+        ise_verify: "{{ise_verify}}"
+        admin: true
+        eap: true
+        allowExtendedValidity: true
+        allowOutOfDateCert: true
+        allowPortalTagTransferForSameSubject: true
+        allowReplacementOfCertificates: false
+        allowReplacementOfPortalGroupTag: true
+        allowRoleTransferForSameSubject: false
+        allowSHA1Certificates: true
+        allowWildCardCertificates: true
+        data: "{{system_cert}}"
+        privateKeyData: "{{system_key}}"
+
+    - name: Sleep for 60 seconds for restart to initiate
+      ansible.builtin.wait_for:
+        timeout: 60
+  
+    - name: Check if ISE is up
+      uri:
+        url: https://{{ansible_host}}/ers/config/service/versioninfo
+        timeout: 10
+        url_username: "{{ise_username}}"
+        url_password: "{{ise_password}}"
+        validate_certs: no
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+      register: version
+      until: version.status==200 and "json" in version and "VersionInfo" in version.json
+      retries: 300
+      delay: 5
+
+    - name: Add F5 NADs
+      cisco.ise.network_device:
+        ise_hostname: "{{ansible_host}}"
+        ise_username: "{{ise_username}}"
+        ise_password: "{{ise_password}}"
+        ise_verify: "{{ise_verify}}"
+        name: "{{ item.name }}"
+        state: present
+        NetworkDeviceIPList:
+        - ipaddress: "{{ item.ip }}"
+          mask: 32
+        authenticationSettings:
+          networkProtocol: RADIUS
+          radiusSharedSecret: "{{ise_password}}"
+      loop: "{{ f5_list }}"
+      when: role == "primary"
+
+    - name: Add F5 User
+      cisco.ise.internal_user:
+        ise_hostname: "{{ansible_host}}"
+        ise_username: "{{ise_username}}"
+        ise_password: "{{ise_password}}"
+        ise_verify: "{{ise_verify}}"
+        state: present
+        name: f5probe
+        password: "{{ise_password}}"
+        changePassword: false
+      when: role == "primary"
+
+    - name: Change PAN from Standalone to Primary
+      cisco.ise.node_standalone_to_primary:
+        ise_hostname: "{{ansible_host}}"
+        ise_username: "{{ise_username}}"
+        ise_password: "{{ise_password}}"
+        ise_verify: "{{ise_verify}}"
+        hostname: "{{inventory_hostname_short}}"
+      when: role == "primary"
+    
+    - name: Register Secondary Nodes
+      cisco.ise.personas_register_node:
+        primary_ip: "{{ansible_host}}"
+        primary_username: "{{ise_username}}"
+        primary_password: "{{ise_password}}"
+        fqdn: "{{item.fqdn}}"
+        username: "{{ise_username}}"
+        password: "{{ise_password}}"
+        roles: "{{ item.roles }}"
+        services: "{{ item.services }}"
+      loop: "{{ secondary_list }}"
+      when: role == "primary"
+
+

@@ -1,0 +1,15 @@
+all:
+    hosts:
+%{ for node in nodes ~}
+      ${node["fqdn"]}:
+        ansible_network_os: eos
+        ise_username: ${username}
+        ise_password: ${password}
+        ise_verify: False
+        ca_cert: "${ca_cert}"
+        system_cert: "${system_cert}"
+        system_key: "${system_key}"
+        role: ${node["role"]}
+        f5_list: ${f5_list}
+        secondary_list: ${secondary_list}
+%{ endfor ~}
