@@ -34,11 +34,11 @@ resource "aws_instance" "mgm" {
   EOT
 
   connection {
-    type = "ssh"
-    user = "ec2-user"
-    host = self.public_ip
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = self.public_ip
     private_key = file("~/.ssh/aws-ssh-1.pem")
-    agent = false
+    agent       = false
   }
 
   provisioner "remote-exec" {

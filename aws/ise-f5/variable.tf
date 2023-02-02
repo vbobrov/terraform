@@ -3,7 +3,7 @@ variable "vpc_cidr" {
 }
 
 variable "ssh_sources" {
-  default = ["100.100.100.0/24","200.200.200.0/24"]
+  default = ["100.100.100.0/24", "200.200.200.0/24"]
 }
 
 variable "ise_count" {

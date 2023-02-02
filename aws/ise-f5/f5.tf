@@ -1,7 +1,7 @@
 resource "aws_network_interface" "f5_management" {
-  description       = "f5-management"
-  subnet_id         = aws_subnet.f5_external.id
-  security_groups   = [aws_security_group.full_access.id]
+  description     = "f5-management"
+  subnet_id       = aws_subnet.f5_external.id
+  security_groups = [aws_security_group.full_access.id]
   tags = merge(
     local.tags,
     {
@@ -60,8 +60,8 @@ resource "aws_instance" "f5" {
       internal_ip    = aws_network_interface.f5_internal.private_ip
       external_ip    = aws_network_interface.f5_external.private_ip
       external_gw    = cidrhost(aws_subnet.f5_external.cidr_block, 1)
-      ise_nodes       = [ for i in range(length(aws_instance.ise)): {"name":"ise-${i+1}","ip":aws_instance.ise[i].private_ip}]
-      ise_vip        = cidrhost(var.f5_vip_cidr,1)
+      ise_nodes      = [for i in range(length(aws_instance.ise)) : { "name" : "ise-${i + 1}", "ip" : aws_instance.ise[i].private_ip }]
+      ise_vip        = cidrhost(var.f5_vip_cidr, 1)
     }
   )
 

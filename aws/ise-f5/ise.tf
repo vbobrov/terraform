@@ -17,11 +17,11 @@ resource "aws_instance" "ise" {
   user_data_replace_on_change = true
   vpc_security_group_ids      = [aws_security_group.full_access.id]
   ebs_block_device {
-    device_name = "/dev/sda1"
+    device_name           = "/dev/sda1"
     delete_on_termination = true
   }
-  user_data                   = <<-EOT
-    hostname=ise-${count.index+1}
+  user_data = <<-EOT
+    hostname=ise-${count.index + 1}
     dnsdomain=aws.ciscodemo.net
     primarynameserver=169.254.169.253
     ntpserver=169.254.169.123

@@ -22,7 +22,7 @@ resource "aws_internet_gateway" "inet" {
 
 resource "aws_subnet" "f5_internal" {
   vpc_id            = aws_vpc.ise.id
-  cidr_block        = cidrsubnet(aws_vpc.ise.cidr_block,8,1)
+  cidr_block        = cidrsubnet(aws_vpc.ise.cidr_block, 8, 1)
   availability_zone = "us-east-1a"
   tags = merge(
     local.tags,
@@ -34,7 +34,7 @@ resource "aws_subnet" "f5_internal" {
 
 resource "aws_subnet" "f5_external" {
   vpc_id            = aws_vpc.ise.id
-  cidr_block        = cidrsubnet(aws_vpc.ise.cidr_block,8,2)
+  cidr_block        = cidrsubnet(aws_vpc.ise.cidr_block, 8, 2)
   availability_zone = "us-east-1a"
   tags = merge(
     local.tags,
