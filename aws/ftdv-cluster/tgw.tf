@@ -18,7 +18,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "fw" {
   transit_gateway_id                              = aws_ec2_transit_gateway.tgw.id
   vpc_id                                          = aws_vpc.fw.id
   transit_gateway_default_route_table_association = false
-  appliance_mode_support = "enable"
+  appliance_mode_support                          = "enable"
   tags = {
     Name    = "fw_attachment"
     Project = "gwlb"

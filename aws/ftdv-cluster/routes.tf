@@ -62,7 +62,7 @@ resource "aws_route" "fw_data_dfgw" {
 
 # Firewall VPC Route Table for FTD data subnets
 resource "aws_route_table" "fw_tgw" {
-  count = local.fw_az_count
+  count  = local.fw_az_count
   vpc_id = aws_vpc.fw.id
   tags = {
     Name    = "fw_tgw"
@@ -79,10 +79,10 @@ resource "aws_route_table_association" "fw_tgw" {
 
 # Default gateway on Firewall TGW Route Table pointing to GWLB endpoint
 resource "aws_route" "fw_tgw_dfgw" {
-  count          = local.fw_az_count
+  count                  = local.fw_az_count
   route_table_id         = aws_route_table.fw_tgw[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id = aws_vpc_endpoint.fw[count.index].id
+  vpc_endpoint_id        = aws_vpc_endpoint.fw[count.index].id
   depends_on = [
     time_sleep.fw
   ]
