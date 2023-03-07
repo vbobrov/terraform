@@ -13,7 +13,6 @@ resource "aws_ec2_transit_gateway" "tgw" {
 }
 
 # TGW Attachment to firewall VPC
-# Only used to get to management interface
 resource "aws_ec2_transit_gateway_vpc_attachment" "fw" {
   subnet_ids                                      = aws_subnet.fw_tgw.*.id
   transit_gateway_id                              = aws_ec2_transit_gateway.tgw.id

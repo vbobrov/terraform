@@ -1,7 +1,3 @@
-variable "region" {
-  default = "us-east-1"
-}
-
 # AZ list where Apps are deployed
 variable "app_azs" {
   default = ["us-east-1a", "us-east-1b"]
@@ -27,6 +23,7 @@ variable "ssh_key" {
   default = "aws-ssh-1"
 }
 
+# Source IP address where ssh connection to the bastian host would initiate.
 variable "ssh_sources" {
   default = ["100.100.100.0/24","200.200.200.0/24"]
 }

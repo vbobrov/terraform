@@ -18,6 +18,9 @@ resource "aws_lb_target_group" "ftd" {
   vpc_id      = aws_vpc.fw.id
   target_type = "ip"
   port        = 6081
+  stickiness {
+    type = "source_ip_dest_ip"
+  }
   health_check {
     port     = 12345
     protocol = "TCP"
@@ -71,7 +74,7 @@ resource "time_sleep" "fw" {
 }
 
 # GWLB Endpoints are placed in FW Data subnets in Firewall VPC
-resource "aws_vpc_endpoint_subnet_association" "app1" {
+resource "aws_vpc_endpoint_subnet_association" "fw" {
   count           = local.fw_az_count
   vpc_endpoint_id = aws_vpc_endpoint.fw[count.index].id
   subnet_id       = aws_subnet.fw_data[count.index].id
