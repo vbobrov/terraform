@@ -58,7 +58,7 @@
         body:
           queueTriggerState: INITIATE_FTDC_REGISTER
         <<: *uri_options
-        
+
     - name: Wait for registration completion
       uri:
         url: "{{base_url}}/aegis/rest/v1/services/targets/devices/{{uid}}"
@@ -67,3 +67,7 @@
       delay: 30
       register: device_state
       until: device_state.json.connectivityState == 1
+    
+    - name: Pause for 2 minutes between clusters
+      pause:
+        minutes: 2
