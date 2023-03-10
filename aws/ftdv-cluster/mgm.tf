@@ -93,11 +93,11 @@ resource "aws_instance" "jumphost" {
   }
 
   connection {
-    type = "ssh"
-    user = "ec2-user"
-    host = self.public_ip
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = self.public_ip
     private_key = file(var.ssh_file)
-    agent = false
+    agent       = false
   }
 
   provisioner "remote-exec" {
@@ -105,7 +105,7 @@ resource "aws_instance" "jumphost" {
   }
 
   provisioner "file" {
-    source = var.ssh_file
+    source      = var.ssh_file
     destination = "/home/ec2-user/.ssh/id_rsa"
   }
 
