@@ -19,6 +19,11 @@ variable "fw_per_az" {
   default = 2
 }
 
+# Cluster Prefix
+variable "cluster_prefix" {
+  default = "ftd-cluster"
+}
+
 # Name of the SSH key in AWS
 variable "ssh_key" {
   default = "aws-ssh-1"

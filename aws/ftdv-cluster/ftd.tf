@@ -73,12 +73,12 @@ resource "aws_instance" "ftd" {
   user_data                   = <<-EOT
   {
     "AdminPassword": "Cisco123!",
-    "Hostname": "gwlb-ftd-${count.index + 1}",
+    "Hostname": "ftd-${count.index + 1}",
     "FirewallMode": "Routed",
     "ManageLocally": "No",
     "Cluster": {
       "CclSubnetRange": "${cidrhost(cidrsubnet(aws_vpc.fw.cidr_block, 8, 16), 1 + 16 * floor(count.index / var.fw_per_az))} ${cidrhost(cidrsubnet(aws_vpc.fw.cidr_block, 8, 16), 14 + 16 * floor(count.index / var.fw_per_az))}",
-      "ClusterGroupName": "lab_cluster_${floor(count.index / var.fw_per_az) + 1}",
+      "ClusterGroupName": "${var.cluster_prefix}-${floor(count.index / var.fw_per_az) + 1}",
       "Geneve": "Yes",
       "HealthProbePort": "12345"
     }

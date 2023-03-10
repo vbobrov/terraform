@@ -7,14 +7,18 @@ all:
       acp: ${acp_policy}
       tier: FTDv30
       licenses: BASE,THREAT,URLFilter,MALWARE
+      devices:
+      %{ for k,v in clusters }
+        - ${k}
+      %{ endfor }
       
   children:
     clusters:
       hosts:
-      %{ for cluster,nodes in clusters }
-        ${cluster}:
+      %{ for k,v in clusters }
+        ${k}:
           hosts:
-            %{ for node in nodes }
+            %{ for node in v }
             - ${node}
             %{ endfor }
       %{ endfor }
