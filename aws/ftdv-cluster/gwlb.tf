@@ -67,7 +67,7 @@ resource "aws_vpc_endpoint" "fw" {
 
 # Delay after GWLB Endpoint creation
 resource "time_sleep" "fw" {
-  create_duration = "120s"
+  create_duration = "180s"
   depends_on = [
     aws_vpc_endpoint.fw
   ]
