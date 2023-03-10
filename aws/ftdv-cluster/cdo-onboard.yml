@@ -1,0 +1,77 @@
+- hosts: cdo
+  connection: httpapi
+  gather_facts: False
+  vars:
+    http_headers: &uri_options
+      timeout: 15
+      headers:
+        Accept: "application/json"
+        Content-Type: "application/json"
+        Authorization: "Bearer {{token}}"      
+  tasks:
+
+    - name: Get UID of cdFMC
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices?q=deviceType:FMCE"
+        <<: *uri_options
+      register: fmc_uid
+      
+    - name: Get FMC Domain UID
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/device/{{fmc_uid.json.0.uid}}/specific-device"
+        <<: *uri_options
+      register: domain_uid
+    
+    - name: Get Access Policies
+      uri: 
+        url: "{{base_url}}/fmc/api/fmc_config/v1/domain/{{domain_uid.json.domainUid}}/policy/accesspolicies?limit=1000"
+        timeout: 15
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+          Authorization: "Bearer {{token}}"
+          fmc-hostname: "{{fmc_uid.json.0.host}}"
+      register: acp_list
+
+    - name: Find matching policy
+      set_fact:
+        acp_id: "{{item.id}}"
+      loop: "{{acp_list.json['items']}}"
+      loop_control:
+        label: "{{item.name}}/{{item.id}}"
+      when: item.name == acp
+    
+    - name: Stop if ACP is not found
+      meta: end_play
+      when: acp_id is not defined
+    
+    - name: Add Device to CDO
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices"
+        timeout: 15
+        method: POST
+        body_format: json
+        body:
+          associatedDeviceUid: "{{fmc_uid.json.0.uid}}"
+          deviceType: FTDC
+          metadata:
+            accessPolicyName: "{{acp}}"
+            accessPolicyUuid: "{{acp_id}}"
+            license_caps: "{{licenses}}"
+            performanceTier: "{{tier}}"
+          model: false
+          name: "{{item}}"
+          state: NEW
+          type: devices
+        <<: *uri_options
+      loop: "{{devices}}"
+      register: cdo_devices
+    
+    - name: Onboard FTD
+      connection: local
+      command: "ansible-playbook -i ansible-inv.yml ftd-onboard.yml --extra-vars 'uid={{item.json.uid}} idx={{idx}}'"
+      loop: "{{cdo_devices.results}}"
+      loop_control:
+        index_var: idx
+        label: "{{item.json.name}}"
+

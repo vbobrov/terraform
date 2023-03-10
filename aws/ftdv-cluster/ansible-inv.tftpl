@@ -1,0 +1,31 @@
+all:
+  hosts:
+    cdo:
+      ansible_network_os: eos
+      token: ${cdo_token}
+      base_url: https://www.defenseorchestrator.com
+      acp: ${acp_policy}
+      tier: FTDv30
+      licenses: BASE,THREAT,URLFilter,MALWARE
+      devices:
+      %{ for k,v in clusters }
+        - ${k}
+      %{ endfor }
+      
+  children:
+    clusters:
+      hosts:
+      %{ for k,v in clusters }
+        ${k}:
+          hosts:
+            %{ for node in v }
+            - ${node}
+            %{ endfor }
+      %{ endfor }
+      vars:
+        ansible_network_os: ios
+        ansible_user: admin
+        ssh_options: -o ConnectTimeout=5 -o ConnectionAttempts=1 -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null
+
+
+

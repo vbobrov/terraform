@@ -1,0 +1,69 @@
+- hosts: cdo
+  connection: httpapi
+  gather_facts: False
+  vars:
+    http_headers: &uri_options
+      timeout: 15
+      headers:
+        Accept: "application/json"
+        Content-Type: "application/json"
+        Authorization: "Bearer {{token}}"      
+  tasks:
+
+    - name: Get specific-device
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/device/{{uid}}/specific-device"
+        <<: *uri_options       
+      register: specific_device
+      until: specific_device.status==200
+      retries: 100
+    
+    - name: Initiate Onboarding
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/firepower/ftds/{{specific_device.json.uid}}"
+        method: PUT
+        body_format: json
+        body:
+          queueTriggerState: INITIATE_FTDC_ONBOARDING
+        <<: *uri_options
+    
+    - name: Get onboarding command
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices/{{uid}}"
+        <<: *uri_options
+      register: cli_command
+
+    - name: Print command
+      debug:
+        msg: "{{cli_command.json.metadata.generatedCommand}}"
+    
+    - name: Set cluster name
+      set_fact:
+        cluster_name: "{{devices[idx|int]}}"
+
+    - name: Send config manager command
+      connection: local
+      command: "ssh {{hostvars[cluster_name].ssh_options}} {{hostvars[cluster_name].ansible_user}}@{{item}} {{cli_command.json.metadata.generatedCommand}}"
+      register: manager
+      retries: 50
+      delay: 30
+      until: '"success" in manager.stdout'
+      loop: "{{hostvars[cluster_name].hosts}}"
+
+    - name: Initiate Registration
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/firepower/ftds/{{specific_device.json.uid}}"
+        method: PUT
+        body_format: json
+        body:
+          queueTriggerState: INITIATE_FTDC_REGISTER
+        <<: *uri_options
+        
+    - name: Wait for registration completion
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices/{{uid}}"
+        <<: *uri_options
+      retries: 50
+      delay: 30
+      register: device_state
+      until: device_state.json.connectivityState == 1

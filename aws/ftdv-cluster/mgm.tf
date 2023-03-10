@@ -77,9 +77,40 @@ resource "aws_instance" "jumphost" {
   subnet_id                   = aws_subnet.mgm.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.management_access.id]
+  user_data                   = <<-EOT
+    #!/bin/bash
+    amazon-linux-extras install epel -y
+    yum-config-manager --enable epel
+    yum update -y
+    pip3 install ansible
+    pip3 install urllib3
+    pip3 install ciscoisesdk
+    /usr/local/bin/ansible-galaxy collection install cisco.ise -p /usr/local/lib/python3.7/site-packages/
+  EOT
   tags = {
     Name    = "mgm_jumphost"
     Project = "gwlb"
+  }
+
+  connection {
+    type = "ssh"
+    user = "ec2-user"
+    host = self.public_ip
+    private_key = file(var.ssh_file)
+    agent = false
+  }
+
+  provisioner "remote-exec" {
+    inline = ["sudo cloud-init status --wait"]
+  }
+
+  provisioner "file" {
+    source = var.ssh_file
+    destination = "/home/ec2-user/.ssh/id_rsa"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["chmod 400 /home/ec2-user/.ssh/id_rsa"]
   }
 }
 
