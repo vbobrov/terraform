@@ -33,6 +33,15 @@ resource "azurerm_linux_virtual_machine" "mgm" {
   admin_username                  = "azadmin"
   disable_password_authentication = true
 
+  user_data = base64encode(<<-EOT
+    #!/bin/bash
+    apt update
+    apt install sshpass
+    apt install python3-pip
+    pip3 install ansible
+  EOT
+  )
+
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy-daily"
@@ -49,5 +58,26 @@ resource "azurerm_linux_virtual_machine" "mgm" {
   admin_ssh_key {
     username   = "azadmin"
     public_key = file("~/.ssh/aws-ssh-1.pub")
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "azadmin"
+    host        = azurerm_public_ip.mgm.ip_address
+    private_key = file(var.ssh_file)
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = ["sudo cloud-init status --wait"]
+  }
+
+  provisioner "file" {
+    source      = var.ssh_file
+    destination = "/home/azadmin/.ssh/id_rsa"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["chmod 400 /home/azadmin/.ssh/id_rsa"]
   }
 }

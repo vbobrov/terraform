@@ -65,12 +65,12 @@ resource "azurerm_linux_virtual_machine" "ftd" {
   ]
   size                            = "Standard_D3_v2"
   admin_username                  = "azadmin"
-  admin_password                  = "Cisco123!"
+  admin_password                  = var.admin_password
   disable_password_authentication = false
 
   custom_data = base64encode(jsonencode(
     {
-      "AdminPassword": "Cisco123!",
+      "AdminPassword": var.admin_password,
       "Hostname": "ftd-${count.index + 1}",
       "FirewallMode": "Routed",
       "ManageLocally": "No",
@@ -93,7 +93,7 @@ resource "azurerm_linux_virtual_machine" "ftd" {
     publisher = "cisco"
     offer     = "cisco-ftdv"
     sku       = "ftdv-azure-byol"
-    version   = "73.0.51"
+    version   = "73069.0.0"
   }
 
   plan {

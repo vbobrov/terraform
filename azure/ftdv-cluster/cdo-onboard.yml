@@ -1,0 +1,130 @@
+- hosts: cdo
+  connection: httpapi
+  gather_facts: False
+  vars:
+    http_headers: &uri_options
+      timeout: 15
+      headers:
+        Accept: "application/json"
+        Content-Type: "application/json"
+        Authorization: "Bearer {{token}}"      
+
+  tasks:
+    - name: Check if cluster_name was supplied
+      fail:
+        msg: cluster_name var must be supplied. Eg. --extra-vars='cluster_name=ftd_cluster'
+      when: cluster_name is not defined
+    
+    - name: Check if cluster is in inventory
+      fail:
+        msg: "Cluster {{cluster_name}} is not found in inventory"
+      when: cluster_name not in hostvars
+
+    - name: Get UID of cdFMC
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices?q=deviceType:FMCE"
+        <<: *uri_options
+      register: fmc_uid
+      
+    - name: Get FMC Domain UID
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/device/{{fmc_uid.json.0.uid}}/specific-device"
+        <<: *uri_options
+      register: domain_uid
+    
+    - name: Get Access Policies
+      uri: 
+        url: "{{base_url}}/fmc/api/fmc_config/v1/domain/{{domain_uid.json.domainUid}}/policy/accesspolicies?limit=1000"
+        timeout: 15
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+          Authorization: "Bearer {{token}}"
+          fmc-hostname: "{{fmc_uid.json.0.host}}"
+      register: acp_list
+
+    - name: Find matching policy
+      set_fact:
+        acp_id: "{{item.id}}"
+      loop: "{{acp_list.json['items']}}"
+      loop_control:
+        label: "{{item.name}}/{{item.id}}"
+      when: item.name == acp
+    
+    - name: Stop if ACP is not found
+      meta: end_play
+      when: acp_id is not defined
+    
+    - name: Add Device to CDO
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices"
+        timeout: 15
+        method: POST
+        body_format: json
+        body:
+          associatedDeviceUid: "{{fmc_uid.json.0.uid}}"
+          deviceType: FTDC
+          metadata:
+            accessPolicyName: "{{acp}}"
+            accessPolicyUuid: "{{acp_id}}"
+            license_caps: "{{licenses}}"
+            performanceTier: "{{tier}}"
+          model: false
+          name: "{{cluster_name}}"
+          state: NEW
+          type: devices
+        <<: *uri_options
+      register: cdo_device
+    
+    - name: Get specific-device
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/device/{{cdo_device.json.uid}}/specific-device"
+        <<: *uri_options
+      register: specific_device
+    
+    - name: Initiate Onboarding
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/firepower/ftds/{{specific_device.json.uid}}"
+        method: PUT
+        body_format: json
+        body:
+          queueTriggerState: INITIATE_FTDC_ONBOARDING
+        <<: *uri_options
+    
+    - name: Get onboarding command
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices/{{cdo_device.json.uid}}"
+        <<: *uri_options
+      register: cli_command
+
+    - name: Print command
+      debug:
+        msg: "{{cli_command.json.metadata.generatedCommand}}"
+    
+    - name: Send config manager command
+      connection: local
+      command: "sshpass -p {{hostvars[cluster_name].ansible_password}} ssh {{hostvars[cluster_name].ssh_options}} {{hostvars[cluster_name].ansible_user}}@{{item}} {{cli_command.json.metadata.generatedCommand}}"
+      register: manager
+      retries: 50
+      delay: 30
+      until: '"success" in manager.stdout'
+      loop: "{{hostvars[cluster_name].hosts}}"
+
+    - name: Initiate Registration
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/firepower/ftds/{{specific_device.json.uid}}"
+        method: PUT
+        body_format: json
+        body:
+          queueTriggerState: INITIATE_FTDC_REGISTER
+        <<: *uri_options
+
+    - name: Wait for registration completion
+      uri:
+        url: "{{base_url}}/aegis/rest/v1/services/targets/devices/{{cdo_device.json.uid}}"
+        <<: *uri_options
+      retries: 50
+      delay: 30
+      register: device_state
+      until: device_state.json.connectivityState == 1
+

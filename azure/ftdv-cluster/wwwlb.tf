@@ -6,6 +6,14 @@ resource "azurerm_public_ip" "www_lb" {
   sku                 = "Standard"
 }
 
+resource "azurerm_public_ip" "www_outbound" {
+  name                = "www-outbound"
+  location            = azurerm_resource_group.gwlb.location
+  resource_group_name = azurerm_resource_group.gwlb.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
 resource "azurerm_lb" "www" {
   name                = "www-lb"
   location            = azurerm_resource_group.gwlb.location
@@ -16,6 +24,11 @@ resource "azurerm_lb" "www" {
     name                 = "www-lb-ip"
     public_ip_address_id = azurerm_public_ip.www_lb.id
     gateway_load_balancer_frontend_ip_configuration_id = azurerm_lb.fw.frontend_ip_configuration[0].id
+  }
+
+  frontend_ip_configuration {
+    name                 = "www-outbound"
+    public_ip_address_id = azurerm_public_ip.www_outbound.id
   }
 }
 
@@ -49,6 +62,19 @@ resource "azurerm_lb_rule" "www" {
   frontend_ip_configuration_name = "www-lb-ip"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.www.id]
   probe_id                       = azurerm_lb_probe.http_probe.id
+  disable_outbound_snat = true
+}
+
+resource "azurerm_lb_outbound_rule" "www" {
+  name                    = "www-outbound"
+  loadbalancer_id         = azurerm_lb.www.id
+  protocol                = "All"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.www.id
+  allocated_outbound_ports =512
+
+  frontend_ip_configuration {
+    name = "www-outbound"
+  }
 }
 
 resource "azurerm_dns_a_record" "www" {

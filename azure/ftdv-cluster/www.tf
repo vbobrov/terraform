@@ -21,7 +21,7 @@ resource "azurerm_linux_virtual_machine" "www" {
   network_interface_ids           = [azurerm_network_interface.www[count.index].id]
   size                            = "Standard_B1s"
   admin_username                  = "azadmin"
-  admin_password                  = "Cisco123!"
+  admin_password                  = var.admin_password
   disable_password_authentication = false
 
   user_data = base64encode(<<-EOT
