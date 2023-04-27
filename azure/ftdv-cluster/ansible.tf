@@ -28,7 +28,7 @@ resource "null_resource" "ftd_provision" {
 
   provisioner "remote-exec" {
     inline = [
-      "ansible-playbook -i /home/ec2-user/ansible-inv.yml /home/ec2-user/cdo-onboard-single.yml --extra-vars='cluster_name=${var.cluster_prefix}-1'"
+      "ansible-playbook -i /home/azadmin/ansible-inv.yml /home/azadmin/cdo-onboard.yml --extra-vars='cluster_name=${var.cluster_prefix}-1'"
     ]
   }
 

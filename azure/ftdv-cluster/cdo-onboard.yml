@@ -103,7 +103,7 @@
     
     - name: Send config manager command
       connection: local
-      command: "sshpass -p {{hostvars[cluster_name].ansible_password}} ssh {{hostvars[cluster_name].ssh_options}} {{hostvars[cluster_name].ansible_user}}@{{item}} {{cli_command.json.metadata.generatedCommand}}"
+      command: "timeout 30 sshpass -p {{hostvars[cluster_name].ansible_password}} ssh {{hostvars[cluster_name].ssh_options}} {{hostvars[cluster_name].ansible_user}}@{{item}} {{cli_command.json.metadata.generatedCommand}}"
       register: manager
       retries: 50
       delay: 30

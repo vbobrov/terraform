@@ -36,8 +36,8 @@ resource "azurerm_linux_virtual_machine" "mgm" {
   user_data = base64encode(<<-EOT
     #!/bin/bash
     apt update
-    apt install sshpass
-    apt install python3-pip
+    apt install -y sshpass
+    apt install -y python3-pip
     pip3 install ansible
   EOT
   )
