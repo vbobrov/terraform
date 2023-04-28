@@ -28,7 +28,7 @@ resource "aws_instance" "mgm" {
     yum-config-manager --enable epel
     yum update -y
     pip3 install ansible
-    pip3 install urllib3
+    pip3 install 'urllib3<2.0'
     pip3 install ciscoisesdk
     /usr/local/bin/ansible-galaxy collection install cisco.ise -p /usr/local/lib/python3.7/site-packages/
   EOT
