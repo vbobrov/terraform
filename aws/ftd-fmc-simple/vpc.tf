@@ -73,6 +73,38 @@ resource "aws_route" "main_default_gw" {
   gateway_id             = aws_internet_gateway.fw.id
 }
 
+# Route Table for FTD Inside Subnet
+resource "aws_route_table" "inside" {
+  vpc_id = aws_vpc.fw.id
+  tags = merge(
+    local.tags,
+    {
+      Name = "inside"
+    }
+  )
+}
+
+# Association to inside subnet
+resource "aws_route_table_association" "inside" {
+  subnet_id      = aws_subnet.inside.id
+  route_table_id = aws_route_table.inside.id
+}
+
+# Routes to SSH Sources to bypass the firewall
+resource "aws_route" "ssh_sources" {
+  count = length(var.ssh_sources)
+  route_table_id         = aws_route_table.inside.id
+  destination_cidr_block = var.ssh_sources[count.index]
+  gateway_id             = aws_internet_gateway.fw.id
+}
+
+# Default GW pointing to inside interface of the router
+resource "aws_route" "inside_default" {
+  route_table_id         = aws_route_table.inside.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_network_interface.ftd_inside.id
+}
+
 resource "aws_security_group" "management_access" {
   vpc_id = aws_vpc.fw.id
   name   = "management-access"
@@ -114,11 +146,22 @@ resource "aws_security_group" "management_access" {
       self             = false
     },
     {
+      description      = "Allow Full Access from inside SG"
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = []
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = [aws_security_group.inside_access.id]
+      self             = false
+    },
+    {
       description      = "Allow Full Access from the same SG"
       from_port        = 0
       to_port          = 0
       protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
+      cidr_blocks      = []
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []

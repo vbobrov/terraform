@@ -14,6 +14,10 @@ output "ftd_public" {
   value = aws_eip.outside.public_ip
 }
 
+output "client_public" {
+  value = aws_instance.client.public_ip
+}
+
 output "password" {
   value = var.admin_password!=""?"Password is supplied in a variable":nonsensitive(random_password.password.result)
 }

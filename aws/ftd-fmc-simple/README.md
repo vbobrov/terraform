@@ -12,6 +12,7 @@ This template will provision the following:
 - Management SG allowing all services from specified source IP addresses
 - Internet Gateway
 - Default route in the main routing table pointing to the Internet Gateway
+- Test Linux host that's placed on the inside interface of the firewall to test connectivity through it
 
 The following variables are available:
 - admin_password. If this variable is left as empty, a random password is generated.
