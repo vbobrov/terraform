@@ -28,6 +28,13 @@ resource "azurerm_lb_backend_address_pool" "fw" {
   }
 }
 
+# resource "azurerm_network_interface_backend_address_pool_association" "fw" {
+#   count                   = var.fw_zones * var.fw_per_zone
+#   network_interface_id    = azurerm_network_interface.fw_data[count.index].id
+#   ip_configuration_name   = "fw-data-nic-ip-${count.index + 1}"
+#   backend_address_pool_id = azurerm_lb_backend_address_pool.fw.id
+# }
+
 resource "azurerm_lb_backend_address_pool_address" "fw" {
   count                   = var.fw_zones * var.fw_per_zone
   name                    = "fw-lb-pool-${count.index + 1}"

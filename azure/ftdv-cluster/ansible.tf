@@ -26,11 +26,11 @@ resource "null_resource" "ftd_provision" {
     destination = "/home/azadmin/cdo-onboard.yml"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "ansible-playbook -i /home/azadmin/ansible-inv.yml /home/azadmin/cdo-onboard.yml --extra-vars='cluster_name=${var.cluster_prefix}-1'"
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "ansible-playbook -i /home/azadmin/ansible-inv.yml /home/azadmin/cdo-onboard.yml --extra-vars='cluster_name=${var.cluster_prefix}-1'"
+  #   ]
+  # }
 
   depends_on = [
     azurerm_linux_virtual_machine.ftd,
