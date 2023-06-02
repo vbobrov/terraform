@@ -1,0 +1,7 @@
+.vscode
+*.swp
+.*
+terraform.tfstate*
+launch.json
+!.gitignore
+__pycache__
