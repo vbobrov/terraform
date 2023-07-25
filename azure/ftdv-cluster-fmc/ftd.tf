@@ -80,19 +80,19 @@ resource "azurerm_linux_virtual_machine" "ftd" {
       "Hostname" : "ftd-${count.index + 1}",
       "FirewallMode" : "Routed",
       "ManageLocally" : "No",
-      "Cluster" : {
-        # CCL Range is calculated based on fw_ccl subnet from IP address .1 to .32
-        "CclSubnetRange" : "${cidrhost(azurerm_subnet.fw_ccl.address_prefixes[0], 1)} ${cidrhost(azurerm_subnet.fw_ccl.address_prefixes[0], 32)}",
-        "ClusterGroupName" : "${var.cluster_prefix}-1",
-        "HealthProbePort" : "${var.health_port}",
-        "GatewayLoadBalancerIP" : "${azurerm_lb.fw.frontend_ip_configuration[0].private_ip_address}",
-        "EncapsulationType" : "vxlan",
-        # These values must match the backend pool of GWLB
-        "InternalPort" : "10800",
-        "ExternalPort" : "10801",
-        "InternalSegId" : "800",
-        "ExternalSegId" : "801"
-      }
+      # "Cluster" : {
+      #   # CCL Range is calculated based on fw_ccl subnet from IP address .1 to .8
+      #   "CclSubnetRange" : "${cidrhost(azurerm_subnet.fw_ccl.address_prefixes[0], 1)} ${cidrhost(azurerm_subnet.fw_ccl.address_prefixes[0], 8)}",
+      #   "ClusterGroupName" : "${var.cluster_prefix}-1",
+      #   "HealthProbePort" : "${var.health_port}",
+      #   "GatewayLoadBalancerIP" : "${azurerm_lb.fw.frontend_ip_configuration[0].private_ip_address}",
+      #   "EncapsulationType" : "vxlan",
+      #   # These values must match the backend pool of GWLB
+      #   "InternalPort" : "10800",
+      #   "ExternalPort" : "10801",
+      #   "InternalSegId" : "800",
+      #   "ExternalSegId" : "801"
+      # }
     }
     )
   )

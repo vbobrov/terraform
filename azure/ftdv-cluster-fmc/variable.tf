@@ -3,7 +3,7 @@ variable "location" {
 }
 
 variable "fw_cidr" {
-  default = "10.100.0.0/16"
+  default = "10.100.10.0/24"
 }
 
 # Number of zones for www

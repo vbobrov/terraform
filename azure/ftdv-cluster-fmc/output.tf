@@ -17,3 +17,7 @@ output "fmc_ip" {
 output "mgm_ip" {
   value = azurerm_public_ip.mgm.ip_address
 }
+
+output "public_server_ip" {
+  value = azurerm_public_ip.public_server.ip_address
+}

@@ -11,7 +11,7 @@ resource "azurerm_subnet" "fw_management" {
   name                 = "fw-management"
   resource_group_name  = azurerm_resource_group.gwlb.name
   virtual_network_name = azurerm_virtual_network.gwlb.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 8, 1)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 1)]
 }
 
 # Data subnet
@@ -19,7 +19,7 @@ resource "azurerm_subnet" "fw_data" {
   name                 = "fw-data"
   resource_group_name  = azurerm_resource_group.gwlb.name
   virtual_network_name = azurerm_virtual_network.gwlb.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 8, 2)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 2)]
 }
 
 # CCL subnet
@@ -27,7 +27,7 @@ resource "azurerm_subnet" "fw_ccl" {
   name                 = "fw-ccl"
   resource_group_name  = azurerm_resource_group.gwlb.name
   virtual_network_name = azurerm_virtual_network.gwlb.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 8, 3)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 3)]
 }
 
 # FMC subnet
@@ -35,13 +35,21 @@ resource "azurerm_subnet" "fmc" {
   name                 = "fmc"
   resource_group_name  = azurerm_resource_group.gwlb.name
   virtual_network_name = azurerm_virtual_network.gwlb.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 8, 4)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 4)]
 }
 
 # VNET for WWW servers
 resource "azurerm_virtual_network" "www" {
   name                = "www-net"
   address_space       = ["10.1.0.0/16"]
+  resource_group_name = azurerm_resource_group.gwlb.name
+  location            = azurerm_resource_group.gwlb.location
+}
+
+# VNET for standalone servers
+resource "azurerm_virtual_network" "servers" {
+  name                = "servers-net"
+  address_space       = ["10.2.0.0/16"]
   resource_group_name = azurerm_resource_group.gwlb.name
   location            = azurerm_resource_group.gwlb.location
 }
@@ -99,4 +107,12 @@ resource "azurerm_subnet" "www" {
 resource "azurerm_subnet_network_security_group_association" "www" {
   subnet_id                 = azurerm_subnet.www.id
   network_security_group_id = azurerm_network_security_group.www.id
+}
+
+# Servers subnet
+resource "azurerm_subnet" "servers" {
+  name                 = "servers-subnet"
+  resource_group_name  = azurerm_resource_group.gwlb.name
+  virtual_network_name = azurerm_virtual_network.servers.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.servers.address_space[0], 8, 1)]
 }
