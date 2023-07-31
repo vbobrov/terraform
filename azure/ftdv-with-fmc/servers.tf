@@ -21,7 +21,7 @@ resource "azurerm_network_interface" "public_server" {
 
   ip_configuration {
     name                          = "public-server-nic-ip"
-    subnet_id                     = azurerm_subnet.servers.id
+    subnet_id                     = azurerm_subnet.public_servers.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public_server.id
   }
@@ -57,6 +57,55 @@ resource "azurerm_linux_virtual_machine" "public_server" {
 
   os_disk {
     name                 = "public-server-os-disk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  admin_ssh_key {
+    username   = "azadmin"
+    public_key = file("~/.ssh/aws-ssh-1.pub")
+  }
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.diag.primary_blob_endpoint
+  }
+}
+
+
+# Private Server NIC
+resource "azurerm_network_interface" "private_server" {
+  name                = "private-server-nic"
+  location            = azurerm_resource_group.gwlb.location
+  resource_group_name = azurerm_resource_group.gwlb.name
+
+  ip_configuration {
+    name                          = "private-server-nic-ip"
+    subnet_id                     = azurerm_subnet.private_servers.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+# Private Server VM
+resource "azurerm_linux_virtual_machine" "private_server" {
+  name                            = "private-server"
+  computer_name                   = "private-server"
+  location                        = azurerm_resource_group.gwlb.location
+  resource_group_name             = azurerm_resource_group.gwlb.name
+  network_interface_ids           = [azurerm_network_interface.private_server.id]
+  size                            = "Standard_B1s"
+  admin_username                  = "azadmin"
+  admin_password                  = var.admin_password
+  disable_password_authentication = false
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy-daily"
+    sku       = "22_04-daily-lts"
+    version   = "latest"
+  }
+
+  os_disk {
+    name                 = "private-server-os-disk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }

@@ -30,6 +30,22 @@ resource "azurerm_subnet" "fw_ccl" {
   address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 3)]
 }
 
+# Inside subnet
+resource "azurerm_subnet" "fw_inside" {
+  name                 = "fw-inside"
+  resource_group_name  = azurerm_resource_group.gwlb.name
+  virtual_network_name = azurerm_virtual_network.gwlb.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 5)]
+}
+
+# Outside subnet
+resource "azurerm_subnet" "fw_outside" {
+  name                 = "fw-outside"
+  resource_group_name  = azurerm_resource_group.gwlb.name
+  virtual_network_name = azurerm_virtual_network.gwlb.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.gwlb.address_space[0], 4, 6)]
+}
+
 # FMC subnet
 resource "azurerm_subnet" "fmc" {
   name                 = "fmc"
@@ -109,10 +125,18 @@ resource "azurerm_subnet_network_security_group_association" "www" {
   network_security_group_id = azurerm_network_security_group.www.id
 }
 
-# Servers subnet
-resource "azurerm_subnet" "servers" {
-  name                 = "servers-subnet"
+# Public Servers subnet
+resource "azurerm_subnet" "public_servers" {
+  name                 = "public-server-subnet"
   resource_group_name  = azurerm_resource_group.gwlb.name
   virtual_network_name = azurerm_virtual_network.servers.name
   address_prefixes     = [cidrsubnet(azurerm_virtual_network.servers.address_space[0], 8, 1)]
+}
+
+# Private Servers subnet
+resource "azurerm_subnet" "private_servers" {
+  name                 = "private-server-subnet"
+  resource_group_name  = azurerm_resource_group.gwlb.name
+  virtual_network_name = azurerm_virtual_network.servers.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.servers.address_space[0], 8, 2)]
 }
