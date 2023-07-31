@@ -62,8 +62,8 @@ resource "azurerm_lb" "fw_elb" {
   sku                 = "Standard"
 
   frontend_ip_configuration {
-    name                                               = "fw-elb-ip"
-    public_ip_address_id                               = azurerm_public_ip.fw_elb.id
+    name                 = "fw-elb-ip"
+    public_ip_address_id = azurerm_public_ip.fw_elb.id
   }
 }
 

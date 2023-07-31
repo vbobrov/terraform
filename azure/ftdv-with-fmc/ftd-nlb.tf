@@ -28,10 +28,10 @@ resource "azurerm_network_interface" "fw_nlb_diagnostic" {
 
 # FTD Inside Interfaces
 resource "azurerm_network_interface" "fw_nlb_inside" {
-  count               = var.fw_zones * var.fw_per_zone
-  name                = "fw-nlb-inside-nic-${count.index + 1}"
-  location            = azurerm_resource_group.gwlb.location
-  resource_group_name = azurerm_resource_group.gwlb.name
+  count                = var.fw_zones * var.fw_per_zone
+  name                 = "fw-nlb-inside-nic-${count.index + 1}"
+  location             = azurerm_resource_group.gwlb.location
+  resource_group_name  = azurerm_resource_group.gwlb.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -43,10 +43,11 @@ resource "azurerm_network_interface" "fw_nlb_inside" {
 
 # FTD Outside Interfaces
 resource "azurerm_network_interface" "fw_nlb_outside" {
-  count               = var.fw_zones * var.fw_per_zone
-  name                = "fw-nlb-outside-nic-${count.index + 1}"
-  location            = azurerm_resource_group.gwlb.location
-  resource_group_name = azurerm_resource_group.gwlb.name
+  count                = var.fw_zones * var.fw_per_zone
+  name                 = "fw-nlb-outside-nic-${count.index + 1}"
+  location             = azurerm_resource_group.gwlb.location
+  resource_group_name  = azurerm_resource_group.gwlb.name
+  enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "fw-nlb-outside-nic-ip-${count.index + 1}"

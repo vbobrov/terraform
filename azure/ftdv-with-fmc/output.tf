@@ -28,9 +28,9 @@ output "public_server_ip" {
 
 output "gateways" {
   value = {
-    inside = cidrhost(azurerm_subnet.fw_inside.address_prefixes[0], 1)
+    inside  = cidrhost(azurerm_subnet.fw_inside.address_prefixes[0], 1)
     outside = cidrhost(azurerm_subnet.fw_outside.address_prefixes[0], 1)
-    data = cidrhost(azurerm_subnet.fw_data.address_prefixes[0], 1)
+    data    = cidrhost(azurerm_subnet.fw_data.address_prefixes[0], 1)
 
   }
 }

@@ -3,7 +3,7 @@ resource "azurerm_public_ip" "public_server" {
   name                = "public-server-ip"
   location            = azurerm_resource_group.gwlb.location
   resource_group_name = azurerm_resource_group.gwlb.name
-  sku = "Standard"
+  sku                 = "Standard"
   allocation_method   = "Static"
 }
 

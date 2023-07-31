@@ -28,10 +28,10 @@ resource "azurerm_network_interface" "fw_diagnostic" {
 
 # FTD Data Interfaces (VXLAN)
 resource "azurerm_network_interface" "fw_data" {
-  count               = var.fw_zones * var.fw_per_zone
-  name                = "fw-data-nic-${count.index + 1}"
-  location            = azurerm_resource_group.gwlb.location
-  resource_group_name = azurerm_resource_group.gwlb.name
+  count                = var.fw_zones * var.fw_per_zone
+  name                 = "fw-data-nic-${count.index + 1}"
+  location             = azurerm_resource_group.gwlb.location
+  resource_group_name  = azurerm_resource_group.gwlb.name
   enable_ip_forwarding = true
 
   ip_configuration {
