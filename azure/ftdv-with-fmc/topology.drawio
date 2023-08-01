@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-07-31T19:11:00.464Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.1 Chrome/112.0.5615.204 Electron/24.6.1 Safari/537.36" etag="c44LxPGeKSgCKnQHuAKs" version="21.6.1" type="device">
+<mxfile host="Electron" modified="2023-08-01T17:09:50.098Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.1 Chrome/112.0.5615.204 Electron/24.6.1 Safari/537.36" etag="IEzjxUhMMT8Wyk6vbT_z" version="21.6.1" type="device">
   <diagram name="Page-1" id="pDXnDWw5rO93SfaOLtf0">
     <mxGraphModel dx="1257" dy="2026" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -197,11 +197,31 @@
         <mxCell id="gl-uLo3om1zxJ34Bp_yc-25" value="private" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/compute/Virtual_Machine.svg;" vertex="1" parent="1">
           <mxGeometry x="720" width="58.22" height="54" as="geometry" />
         </mxCell>
-        <mxCell id="gl-uLo3om1zxJ34Bp_yc-27" value="UDR for 0.0.0.0/0" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="860" y="30" width="120" height="30" as="geometry" />
+        <mxCell id="gl-uLo3om1zxJ34Bp_yc-27" value="UDR&lt;br&gt;0.0.0.0/0&lt;br&gt;10.2.1.0/24" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="880" y="30" width="80" height="60" as="geometry" />
         </mxCell>
         <mxCell id="gl-uLo3om1zxJ34Bp_yc-28" value="FMC" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.management_console;fillColor=#F58534;gradientColor=none;" vertex="1" parent="1">
           <mxGeometry x="729.11" y="430" width="40" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gl-uLo3om1zxJ34Bp_yc-29" value="10.2.1.0/24" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=19;" vertex="1" parent="1">
+          <mxGeometry x="546.11" y="-50" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gl-uLo3om1zxJ34Bp_yc-30" value="10.2.2.0/24" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=19;" vertex="1" parent="1">
+          <mxGeometry x="687.87" y="-50" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gl-uLo3om1zxJ34Bp_yc-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;fillColor=#e1d5e7;strokeColor=#9673a6;" edge="1" parent="1" source="gl-uLo3om1zxJ34Bp_yc-4" target="gl-uLo3om1zxJ34Bp_yc-17">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="-190" as="sourcePoint" />
+            <mxPoint x="982" y="230" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="609" y="-120" />
+              <mxPoint x="1132" y="-120" />
+              <mxPoint x="1132" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gl-uLo3om1zxJ34Bp_yc-32" value="UDR&lt;br&gt;10.2.2.0/24" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="880" y="-120" width="80" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
