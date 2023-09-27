@@ -81,6 +81,7 @@ resource "azurerm_lb_outbound_rule" "www" {
 
 # DNS Record for WWW Public IP
 resource "azurerm_dns_a_record" "www" {
+  count               = var.create_dns
   name                = "www"
   zone_name           = "az.ciscodemo.net"
   resource_group_name = "dns"

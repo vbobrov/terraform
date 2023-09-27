@@ -50,3 +50,8 @@ variable "ssh_file" {
 variable "ssh_sources" {
   default = ["100.100.100.0/24", "200.200.200.0/24"]
 }
+
+# Create DNS record for www external ip
+variable "create_dns" {
+  default = 0
+}
