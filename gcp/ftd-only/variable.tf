@@ -19,17 +19,17 @@ variable "fmc_ip" {
 
 variable "fmc_key" {
   description = "FMC Registration Key"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "admin_password" {
   description = "FTD CLI Admin Password"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "subnets" {
   description = "List of subnets for FTD NICs in the same order as Network Interfaces"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "ftd_config" {
