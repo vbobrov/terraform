@@ -1,4 +1,4 @@
-#gcp_project= "project123"
+gcp_project= "project123"
 
 machine_type = "c2-standard-16"
 
