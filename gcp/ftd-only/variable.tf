@@ -8,6 +8,14 @@ variable "region" {
   description = "Region where to deploy instances"
 }
 
+variable "disk_encrypt_key" {
+  description = "Self-link for KMS Key to encrypt FTD disk"
+}
+
+variable "ftd_service_account" {
+  description = "Service Account for FTD Instances"
+}
+
 # Run the following command to get image names: gcloud compute images list --project cisco-public --no-standard-image
 variable "ftd_image" {
   description = "FTD Image/Version"

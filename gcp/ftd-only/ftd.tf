@@ -3,6 +3,10 @@ data "google_compute_image" "ftd" {
   name    = var.ftd_image
 }
 
+data "google_service_account" "ftd" {
+  account_id =   var.ftd_service_account
+}
+
 resource "google_compute_instance" "ftd" {
   for_each = var.ftd_config
   name     = each.key
@@ -17,13 +21,20 @@ resource "google_compute_instance" "ftd" {
   machine_type   = var.machine_type
   zone           = "${var.region}-${each.value["zone"]}"
   can_ip_forward = true
+  service_account {
+    email = data.google_service_account.ftd.email
+    scopes = [ "cloud-platform" ]
+  }
+
   boot_disk {
+    kms_key_self_link = var.disk_encrypt_key
     initialize_params {
       image = data.google_compute_image.ftd.self_link
     }
   }
   metadata = {
     serial-port-enable = true
+    block-project-ssh-keys = true
   }
 
   dynamic "network_interface" {

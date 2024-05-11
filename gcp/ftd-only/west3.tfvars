@@ -4,6 +4,10 @@ machine_type = "c2-standard-16"
 
 region = "us-west3"
 
+disk_encrypt_key = "projects/project123/locations/global/keyRings/diskencrypt/cryptoKeys/ftdencrypt"
+
+ftd_service_account = "ftd-910"
+
 ftd_image = "cisco-ftdv-7-2-5-208"
 
 fmc_ip = "1.2.3.4"

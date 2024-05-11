@@ -9,6 +9,8 @@ Variables are as follows:
 - gcp_project - Specifies GCP project where to deploy
 - machine_type - GCP machine type for FTD instances
 - region - Region where to deploy the instances
+- disk_encrypt_key - Self link for disk encryption KMS key
+- ftd_service_account - Account ID for service account to be used for FTD instances
 - ftd_image - Image to use for FTD instances
 - fmc_ip - IP Address of FMC
 - fmc_key - FMC Registration key
