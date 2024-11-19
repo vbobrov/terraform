@@ -3,9 +3,9 @@ This template will deploy two or more Frre RADIUS Servers behind a Netscaler ADC
 
 The template will fully configure the load balancer and the Free RADIUS nodes, albeit with minimal settings.
 
-FreeRADIUS servers are configured 
+FreeRADIUS servers are configured with username cisco and password cisco.
 
-Full walk through of ADC configuration can be found at https://securityccie.net/2023/02/01/ise-and-f5-deployment-with-terraform-and-ansible/
+Full walk through of ADC configuration can be found at https://securityccie.net/2024/11/18/netscaler-for-ise-deployments/
 
 The topology of the deployment is shown on the diagram
 
@@ -35,7 +35,7 @@ The following resources are provisioned:
 -- The host is connected to external subnet and is assigned a public IP address
 
 # Routing
-For VIP, we need to use an IP range that is outside of the CIDR range of the VPC. AWS would not allow us to route a subnet that conflicts with a VPC towards the F5. 10.2.0.0/16 is used for VIP Range. 
+For VIP, we need to use an IP range that is outside of the CIDR range of the VPC. AWS would not allow us to route a subnet that conflicts with a VPC towards Netscaler. 10.2.0.0/16 is used for VIP Range. 
 
 In order to RADIUS to properly integrate with ADC, the load balancer must be inline between ISE and the network.
 
