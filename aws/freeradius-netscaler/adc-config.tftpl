@@ -1,0 +1,44 @@
+<NS-PRE-BOOT-CONFIG>
+  <NS-CONFIG>
+    add ns ip ${internal_ip} ${internal_mask} -vServer DISABLED
+    add ns ip ${external_ip} ${external_mask} -type VIP
+    %{ for i,server in servers ~}
+    add server radius-${i+1} ${server}
+    %{ endfor ~}
+    add serviceGroup radius-auth RADIUS -maxClient 0 -maxReq 0 -cip DISABLED -usip YES -useproxyport NO -cltTimeout 120 -svrTimeout 120 -CKA NO -TCPB NO -CMP NO
+    add serviceGroup radius-acct RADIUS -maxClient 0 -maxReq 0 -cip DISABLED -usip YES -useproxyport NO -cltTimeout 120 -svrTimeout 120 -CKA NO -TCPB NO -CMP NO
+    add serviceGroup tacacs TCP -maxClient 0 -maxReq 0 -cip DISABLED -usip YES -useproxyport YES -cltTimeout 9000 -svrTimeout 9000 -CKA NO -TCPB NO -CMP NO
+    add lb vserver radius-auth RADIUS ${vip} 1812 -rule "CLIENT.UDP.RADIUS.ATTR_TYPE(31)" -cltTimeout 120
+    add lb vserver radius-acct RADIUS ${vip} 1813 -rule "CLIENT.UDP.RADIUS.ATTR_TYPE(31)" -cltTimeout 120
+    add lb vserver tacacs TCP ${vip} 49 -persistenceType SOURCEIP -cltTimeout 1800
+    add lb monitor radius-cisco RADIUS -respCode 2 -userName cisco -password cisco -radKey cisco -LRTM DISABLED -destPort 1812
+    bind lb vserver radius-auth radius-auth
+    bind lb vserver radius-acct radius-acct
+    bind lb vserver tacacs tacacs
+    add lb group radius -persistenceType RULE -persistenceBackup SOURCEIP -rule "CLIENT.UDP.RADIUS.ATTR_TYPE(31)"
+    bind lb group radius radius-auth
+    bind lb group radius radius-acct
+    %{ for i,server in servers ~}
+    bind serviceGroup radius-auth radius-${i+1} 1812
+    bind serviceGroup radius-acct radius-${i+1} 1813
+    bind serviceGroup tacacs radius-${i+1} 49
+    %{ endfor ~}
+    bind serviceGroup radius-auth -monitorName radius-cisco
+    bind serviceGroup radius-acct -monitorName radius-cisco
+    bind serviceGroup tacacs -monitorName radius-cisco
+    add policy dataset radius_servers ipv4
+    %{ for i,server in servers ~}
+    bind policy dataset radius_servers ${server} -index ${i+1}
+    %{ endfor ~}
+    add ns acl radius-coa ALLOW -srcIP = radius_servers -srcPort = 1-65535 -destPort = 1700 -protocol UDP -priority 10 -kernelstate SFAPPLIED61
+    apply ns acls
+    add rnat coa-nat radius-coa
+    bind rnat coa-nat ${vip}
+    add rnat InternetNAT ${internal_net} ${internal_mask}
+    bind rnat InternetNAT ${external_ip}
+    add route 0.0.0.0 0.0.0.0 ${external_gw}
+    add route 0.0.0.0 128.0.0.0 ${external_gw}
+    add route 128.0.0.0 128.0.0.0 ${external_gw}
+    rm route 0.0.0.0 0.0.0.0 ${management_gw}
+  </NS-CONFIG>
+</NS-PRE-BOOT-CONFIG>
